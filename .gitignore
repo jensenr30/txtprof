@@ -1,0 +1,8 @@
+/bin/DebugLin/txtprof
+/bin/ReleaseLin/txtprof
+
+/obj/DebugLin/*.*
+/obj/ReleaseLin/*.*
+
+*.orig
+*.layout

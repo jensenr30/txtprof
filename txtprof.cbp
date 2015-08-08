@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="txtprof" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="DebugLin">
+				<Option output="bin/DebugLin/txtprof" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/DebugLin" />
+				<Option object_output="obj/DebugLin" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="ReleaseLin">
+				<Option output="bin/ReleaseLin/txtprof" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/ReleaseLin/" />
+				<Option object_output="obj/ReleaseLin/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="txtprof.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="txtprof.h" />
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

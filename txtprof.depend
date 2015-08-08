@@ -1,0 +1,29 @@
+# depslib dependency file v1.0
+1439052062 source:/mnt/safe/Programming/Experiments/Keyboard_Profiler2/keyboard_profiler2.c
+	<stdio.h>
+	"keyboard_profiler2.h"
+
+1439051850 /mnt/safe/Programming/Experiments/Keyboard_Profiler2/keyboard_profiler2.h
+
+1439052062 source:/mnt/safe/Programming/Experiments/keyboard_profiler2/keyboard_profiler2.c
+	<stdio.h>
+	"keyboard_profiler2.h"
+
+1439054520 /mnt/safe/Programming/Experiments/keyboard_profiler2/keyboard_profiler2.h
+
+1439054231 source:/mnt/safe/Programming/Experiments/keyboard_profiler2/main.c
+	<stdio.h>
+	"keyboard_profiler2.h"
+
+1439063663 source:/mnt/safe/Programming/Experiments/txtprof/main.c
+	<stdio.h>
+	"txtprof.h"
+
+1439066843 /mnt/safe/Programming/Experiments/txtprof/txtprof.h
+
+1439063759 source:/mnt/safe/Programming/Experiments/txtprof/txtprof.c
+	<stdio.h>
+	<string.h>
+	"txtprof.h"
+	<stdlib.h>
+

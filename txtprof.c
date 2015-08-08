@@ -88,14 +88,14 @@ int txtprof(int argc, char *argv[]){
 			i = i + 2;;
 		}
 		else if	(!strcmp(argv[i],TXTPROF_ARG_S) || !strcmp(argv[i],TXTPROF_ARG_SAVE_PROFILE)) {
-			// record where you want to save the text profile
-			load_profile = argv[i+1];
+			// record where you want to save the text profile to
+			save_profile = argv[i+1];
 			// processed two arguments
 			i = i + 2;
 		}
 		else if	(!strcmp(argv[i],TXTPROF_ARG_L) || !strcmp(argv[i],TXTPROF_ARG_LOAD_PROFILE)) {
-			// record where you want to save the text profile
-			save_profile = argv[i+1];
+			// record where you want to load the text profile from
+			load_profile = argv[i+1];
 			// processed two arguments
 			i = i + 2;
 		}
@@ -157,20 +157,24 @@ int txtprof(int argc, char *argv[]){
 	// if the user wanted to load a profile AND process input files, the profile
 	// will be loaded, and then the input file(s) will be processed and the data
 	// from that(them) will be added to the loaded profile.
-	profile_load(&myProf, load_profile);
+	if (load_profile != NULL) {
+		
+		profile_load(&myProf, load_profile);
+	
+	}
 	
 	//--------------------------------------------------------------------------
 	// process input files and update profile
 	//--------------------------------------------------------------------------
 	
-    unsigned char pc = '\0';		// previous character
-    unsigned char cc = '\0';		// current character
+    char pc = '\0';		// previous character
+    char cc = '\0';		// current character
     // this keep track of how many characters were found in a given file
     long long unsigned charsFound;
     
     // for every input file
     for (i = 0; i < inputs; i++) {
-		
+		printf("Processing input %d/%d...\n",i,inputs);
 		// attemp to open the file for reading
 		FILE *fp = fopen(input_files[i],"r");
 		// if the file was not opened,
@@ -198,7 +202,7 @@ int txtprof(int argc, char *argv[]){
 		// search the entire 
 		while ( ( cc = fgetc(fp)) != EOF ) {
 			// record the occurrence
-			myProf.occur[pc][cc]++;
+			myProf.occur[(unsigned char)pc][(unsigned char)cc]++;
 			charsFound++;
 		}
 		
@@ -269,7 +273,7 @@ int profile_save(struct text_profile *pro, char *filename){
 	}
 	
 	// attempt to open the file for writing
-	FILE *fp = fopen(filename,"w");
+	FILE *fp = fopen(filename,"w+");
 	// make sure the file opened
 	if (fp == NULL) {
 		txtprof_log_s("profile_save() could not open file for writing: ",filename);
@@ -304,6 +308,7 @@ int profile_load(struct text_profile *pro, char *filename){
 		return -1;
 	}
 	
+	
 	// attempt to open the filename for reading
 	FILE *fp = fopen(filename,"r");
 	// make sure the fie opened
@@ -328,11 +333,13 @@ int txtprof_generate(struct text_profile *pro, long long unsigned gen, char *fil
 		return -1;
 	}
 	
+	char close = 1;
 	// if the filename was NULL,
 	FILE *fp = NULL;
 	if (filename == NULL) {
 		// just print the shit to the terminal
 		fp = stdout;
+		close = 0;
 	}
 	// otherwise, if the user wants to print to a specific file,
 	else {
@@ -347,7 +354,10 @@ int txtprof_generate(struct text_profile *pro, long long unsigned gen, char *fil
 	
 	/// TODO: write generation code. parse the profile to 
 	
-	
+	// close the file, if you weren't printing to stdout.
+	if (close) {
+		fclose(fp);
+	}
 	
 	return 0;
 }

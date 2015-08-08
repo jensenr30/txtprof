@@ -1,8 +1,8 @@
 //==============================================================================
 // general definitions
 //==============================================================================
-#define TXTPROF_LOG_FILE_NAME "keyboard_log.txt"
-#define TXTPROF_DEBUG 0
+#define TXTPROF_LOG_FILE_NAME "txtprof_log.txt"
+#define TXTPROF_DEBUG 1
 #define TXTPROF_MAX_INPUT_FILES 256
 #define TXTPROF_CHARACTERS 256
 

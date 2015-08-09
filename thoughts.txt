@@ -1,0 +1,18 @@
+Today I created a program that inputs text and outputs garbage (well, sometimes it actually looks pretty neat).
+It is actually kind of neat.
+At the very least, it is an exercise in predictive programatic thought.
+There are many things that this program does that I did not even consider.
+But, now having worked with the program, it's rules (some might call them limitations. I might be some) are being more clear to me.
+As with a lot of things, as the rules become clearer to me, I become less interested.
+Or, once the nature of the system can be understood at some level and the program is understood to not be as complex as one might have thought, it ceases to be as interesting.
+But there are still thing I have yet to do.
+There are things I have not tried.
+I've thought about feedback, but I have not tried it yet.
+Maybe that would be more interesting that I think?
+But I doubt it.
+I will have to think of something else to make myself feel smart and important.
+
+To improve this program, maybe it should be able to recall more characters.
+I could increase the pattern length from two characters to three, and the words might match the input more closely.
+It would eliminate incorrect single letters. (no more "words" like 'l' 't' and 's' hanging around).
+Or, maybe it would be better to try to sic a neural network on this project like Nick Wagner had mentioned a year ago...

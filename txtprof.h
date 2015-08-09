@@ -2,8 +2,7 @@
 // general definitions
 //==============================================================================
 #define TXTPROF_LOG_FILE_NAME "txtprof_log.txt"
-#define TXTPROF_DEBUG 1
-#define TXTPROF_MAX_INPUT_FILES 256
+#define TXTPROF_MAX_INPUT_FILES 1000
 #define TXTPROF_CHARACTERS 256
 
 
@@ -25,15 +24,19 @@
 //	$	txtprof my_code.c -s my_code_profile.txt
 //	$	txtprof my_code.c --save-profile my_code_profile.txt
 
-// the argument following either of these will be interpreted as the file to
-// which the profile of the text should be saved
-#define TXTPROF_ARG_S "-s"
-#define TXTPROF_ARG_SAVE_PROFILE "--save-profile"
+// this is the help option. This will display the help.
+#define TXTPROF_ARG_H "-h"
+#define TXTPROF_ARG_HELP "--help"
 
 // the argument following either of these will be interpreted as the file from
 // which a profile should be loaded
 #define TXTPROF_ARG_L "-l"
 #define TXTPROF_ARG_LOAD_PROFILE "--load-profile"
+
+// the argument following either of these will be interpreted as the file to
+// which the profile of the text should be saved
+#define TXTPROF_ARG_S "-s"
+#define TXTPROF_ARG_SAVE_PROFILE "--save-profile"
 
 // the argument following either of these will be interpreted as the number
 // of characters to generate
@@ -45,6 +48,8 @@
 #define TXTPROF_ARG_O "-o"
 #define TXTPROF_ARG_OUTPUT_FILE "--output-file"
 
+//enable verbose debugging messages
+#define TXTPROF_ARG_DEBUG "--debug"
 
 //==============================================================================
 // PROFILE STRUCTURE
@@ -72,7 +77,10 @@ struct text_profile {
 //==============================================================================
 
 int txtprof(int argc, char *argv[]);
+void txtprof_help(void);
 int txtprof_generate(struct text_profile *pro, long long unsigned gen, char *filename);
+char txtprof_gen_char(struct text_profile *pro);
+char txtprof_gen_char_next(struct text_profile *pro, unsigned char c);
 int profile_erase(struct text_profile *pro);
 int profile_save(struct text_profile *pro, char *filename);
 int profile_load(struct text_profile *pro, char *filename);

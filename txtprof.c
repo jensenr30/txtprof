@@ -3,6 +3,10 @@
 #include <string.h>
 #include "txtprof.h"
 #include "jentils.h"
+#include <time.h>
+
+// by default, the user probably does not want to debug txtprof
+int g_txtprof_debug = 0;
 
 //==============================================================================
 // these function log errors
@@ -63,20 +67,35 @@ int txtprof(int argc, char *argv[]){
     long long unsigned generate = 0;
     char *output_file = NULL;
     
-    // print what the arguments were
-    if (TXTPROF_DEBUG) {
-		printf("input arguments are:\n\n");
-		for (i = 0; i < argc; i++) {
-			printf("arg_%2d\t\"%s\"\n",i,argv[i]);
-		}
-		printf("\n");
-    }
-    
     // loop through all arguments and interpret them
     i = 1; // skip the first argument, which is the keyprof file
     while ( i < argc) {
+		if (!strcmp(argv[i],TXTPROF_ARG_DEBUG)) {
+			// turn on verbose debugging messages
+			g_txtprof_debug = 1;
+			// processed one argument
+			i++;
+		}
+		else if (!strcmp(argv[i],TXTPROF_ARG_H) || !strcmp(argv[i],TXTPROF_ARG_HELP)) {
+			// help the user
+			txtprof_help();
+			// processed one argument
+			i++;
+		}
+		else if	(!strcmp(argv[i],TXTPROF_ARG_L) || !strcmp(argv[i],TXTPROF_ARG_LOAD_PROFILE)) {
+			// record where you want to load the text profile from
+			load_profile = argv[i+1];
+			// processed two arguments
+			i = i + 2;
+		}
+		else if	(!strcmp(argv[i],TXTPROF_ARG_S) || !strcmp(argv[i],TXTPROF_ARG_SAVE_PROFILE)) {
+			// record where you want to save the text profile to
+			save_profile = argv[i+1];
+			// processed two arguments
+			i = i + 2;
+		}
 		// check if it was a 
-		if (!strcmp(argv[i],TXTPROF_ARG_G) || !strcmp(argv[i],TXTPROF_ARG_GENERATE)) {
+		else if (!strcmp(argv[i],TXTPROF_ARG_G) || !strcmp(argv[i],TXTPROF_ARG_GENERATE)) {
 			// record how many characters you want to generate
 			generate = atoi(argv[i+1]);
 			// processed two arguments
@@ -87,18 +106,6 @@ int txtprof(int argc, char *argv[]){
 			output_file = argv[i+1];
 			// skip the argument after the option.
 			i = i + 2;;
-		}
-		else if	(!strcmp(argv[i],TXTPROF_ARG_S) || !strcmp(argv[i],TXTPROF_ARG_SAVE_PROFILE)) {
-			// record where you want to save the text profile to
-			save_profile = argv[i+1];
-			// processed two arguments
-			i = i + 2;
-		}
-		else if	(!strcmp(argv[i],TXTPROF_ARG_L) || !strcmp(argv[i],TXTPROF_ARG_LOAD_PROFILE)) {
-			// record where you want to load the text profile from
-			load_profile = argv[i+1];
-			// processed two arguments
-			i = i + 2;
 		}
 		else {
 			// if you have not read in too many files already,
@@ -119,15 +126,24 @@ int txtprof(int argc, char *argv[]){
 		}
     }
     
+    // print what the arguments were
+    if (g_txtprof_debug) {
+		printf("input arguments are:\n\n");
+		for (i = 0; i < argc; i++) {
+			printf("arg_%2d\t\"%s\"\n",i,argv[i]);
+		}
+		printf("\n");
+    }
+    
     // print how you interpreted the arguments
-    if (TXTPROF_DEBUG) {
+    if (g_txtprof_debug) {
 		
 		// print all of the input files that were found
 		for (i = 0; i < inputs; i++) {
 			printf("Input File %3d:  \"%s\"\n",i+1,input_files[i]);
 		}
 		if (inputs < 1) {
-			printf("No input files!");
+			printf("No input files!\n");
 		}
 		// print the save profile file
 		if (save_profile != NULL) {
@@ -143,7 +159,7 @@ int txtprof(int argc, char *argv[]){
 			printf("Output File: \"%s\"\n",output_file);
 		}
 		else {
-			printf("Printing to command line!\n");
+			printf("Output File: NULL - printing any generated text to command line...\n");
 		}
     }
     
@@ -179,7 +195,9 @@ int txtprof(int argc, char *argv[]){
     
     // for every input file
     for (i = 0; i < inputs; i++) {
-		printf("Processing input %d/%d...\n",i,inputs);
+		
+		if (g_txtprof_debug) printf("Processing input %d/%d...\n",i+1,inputs);
+		
 		// attemp to open the file for reading
 		FILE *fp = fopen(input_files[i],"r");
 		// if the file was not opened,
@@ -235,7 +253,7 @@ int txtprof(int argc, char *argv[]){
 		// otherwise,
 		else {
 			// the save faile
-			printf("Couldn't save text_profile to file: \"%s\"",save_profile);
+			printf("Couldn't save text_profile to file: \"%s\"\n",save_profile);
 		}	
     }
     
@@ -248,6 +266,75 @@ int txtprof(int argc, char *argv[]){
 	return 0;
 }
 
+
+/// this displays helpful information to the user
+void txtprof_help(void){
+	printf("\n");//	  80 printed characters on the command line is right at the pipe ->|
+	printf("usage:  txtprof [optional input files] <operations>                         \n");
+	printf("\n");//	  80 printed characters on the command line is right at the pipe ->|
+	printf("options:                                                                    \n");
+	printf("  -h, --help                   I've fallen and I can't get up               \n");
+	printf("  -l, --load <file>            specify the text profile to load             \n");
+	printf("  -s, --save-profile <file>    specify where to save the text profile       \n");
+	printf("  -g, --generate <number>      specify the number of characters to generate \n");
+	printf("  -o, --output-file <file>     specify where to print generated text        \n");
+	printf("      --debug                  enable verbose debugging msgs (adults only)  \n");
+	printf("\n");//	  80 printed characters on the command line is right at the pipe ->|
+	printf("examples:                                                                   \n");
+	printf("  $ txtprof a_good_book.txt -g 1000                                         \n");
+	printf("        This demonstrates the most basic operation txtprof does. txtprof    \n");
+	printf("        will read a_good_book.txt, generate a 'text profile' based on the   \n");
+	printf("        characters in that file, and then generate 1000 new characters that \n");
+	printf("        roughly fit the patterns observed in a_good_book.txt. Because this  \n");
+	printf("        command does NOT specify the output-file, the generated characters  \n");
+	printf("        are printed to the command line.                                    \n");
+	printf("  $ txtprof my_file.txt -g 20000 -o nonesense.txt                           \n");
+	printf("        This will generate 20000 characters based on the content of         \n");
+	printf("        my_file.txt. Those characters will be printed to the nonesense.txt  \n");
+	printf("  $ txtprof Dune.txt -s dune_profile.txt                                    \n");
+	printf("        This command generates a text profile from Dune.txt and saves it in \n");
+	printf("        dune_profile.txt for later use.                                     \n");
+	printf("  $ txtprof -l dune_profile.txt -g 777                                      \n");
+	printf("        This command reads the text profile from dune_profile.txt which had \n");
+	printf("        been saved earlier. After dune_profile.txt has been loaded, 777     \n");
+	printf("        characters will be printed to the terminal.                         \n");
+	printf("  $ txtprof DuneMessiah.txt -l dune_profile.txt -s dune_1_and_2_profile.txt \n");
+	printf("        This creates a profile from DuneMessiah.txt and combines it with the\n");
+	printf("        existing profile from dune_profile.txt. It saves the combined text  \n");
+	printf("        profile to dune_1_and_2_profile.txt                                 \n");
+	printf("  $ txtprof a.txt b.txt c.txt -s abc_prof.txt -g 2500 -o abc_gen.txt        \n");
+	printf("        This command will read all three text files a.txt, b.txt, and c.txt \n");
+	printf("        and save a text profile based on the combined texts to abc_prof.txt \n");
+	printf("        In addition, 2500 characters will be generated and written to       \n");
+	printf("        abc_gen.txt                                                         \n");
+	printf("  $ txtprof 500_characters.txt -g 10000 -o school_report.txt                \n");
+	printf("        This demonstrates the concept of up-sampling                        \n");
+	printf("  $ txtprof english.txt -g 5000 -o mock_english.txt                         \n");
+	printf("  $ txtprof mock_english.txt -g 5000 -o mock_mock_english.txt               \n");
+	printf("        These two commands show the concept of iteration (or \"feedback\"). \n");
+	printf("        In the first command, A text profile is created from english.txt    \n");
+	printf("        (something assumed to be written in english). This profile is used  \n");
+	printf("        to generate mock_english.txt. Then in the second command, a text    \n");
+	printf("        profile is created from mock_english.txt and is used to create      \n");
+	printf("        mock_mock_english.txt. This iterative process could continue        \n");
+	printf("        indefinitely, but I have a feeling that after the first iteration it\n");
+	printf("        it would cease to be interesting. Please prove me wrong.     -Jensen\n");
+	printf("\n");//	  80 printed characters on the command line is right at the pipe ->|
+	// exmples I want to cover in the help menu:
+	// done		description	
+	//	+		open file; generate text
+	//	+		open file; generate text to a file
+	//	+		open file; generate profile; save profile to file
+	//	+		load profile from file; generate text (no new text file required)
+	//	+		load data from text file AND previously saved profile; generate characters
+	//	+		load data from multiple text files; generate characters
+	//	+		demonstrate the concept of up-sampling
+	//	+		load data from text file; generate a new textfile that will be 
+				// nonesense; then load data from that newly generated textfile 
+				// and make a second text file; basically, suggest feeding the
+				// output back into the input and collect the ensuing data.	
+	
+}
 
 /// this will erase the profile (to zeros)
 int profile_erase(struct text_profile *pro){
@@ -383,12 +470,142 @@ int txtprof_generate(struct text_profile *pro, long long unsigned gen, char *fil
 		}
 	}
 	
-	
-	/// TODO: write generation code. parse the profile to
+	long long unsigned i;
+	// generate the first character
+	char c = txtprof_gen_char(pro);
+	// print the first character
+	fputc(c,fp);
+	// generate and printthe rest of the characters
+	for (i = 1; i <gen; i++) {
+		// gen next character
+		c = txtprof_gen_char_next(pro, (unsigned char)c);
+		// print it
+		fputc(c,fp);
+	}
 	
 	// close the file, if you weren't printing to stdout.
 	if (close) {
 		fclose(fp);
 	}
 	return 0;
+}
+
+
+/// this gets you a random character from a profile.
+// this should only be used to get the first character, as it is really slow.
+// this sums up all of the occurrences of characters in the profile and picks
+// one using rand() based on weighted probabilities.
+// This is a lot of adding, and should be only used to generate a starting
+// point. After you get your first random character, you can use the other
+// function, "txtprof_gen_char_next()" which will operate much faster.
+char txtprof_gen_char(struct text_profile *pro){
+	
+	// see if the profil is invalid
+	if (pro == NULL) {
+		txtprof_log("txtprof_gen_char() received NULL profile");
+		return -1;
+	}
+	
+	// this keeps track of whether or not you have used this function before.
+	// This ensures that srand doesn't keep getting called continuously.
+	static char been_here_before = 0;
+	if(!been_here_before) {
+		// get a "random" seed from the current ime
+		srand(time(NULL));
+		been_here_before = 1;
+	}
+	
+	// this is what we will use to keep track of how many times each character
+	// appears, regardless of what comes before or after it.
+	long long unsigned occur_total[TXTPROF_CHARACTERS];
+	// this keeps track of how many characters there are in total (all chars)
+	long long unsigned occur_all = 0;
+	unsigned i, j;
+	
+	// sum all characters
+	for (i = 0; i < TXTPROF_CHARACTERS; i ++) {
+		// initialize each total to zero before adding.
+		occur_total[i] = 0;
+		// sum up the total number of times that the [i]th character occurs.
+		for (j = 0; j < TXTPROF_CHARACTERS; j++) {
+			occur_total[i] += pro->occur[i][j];
+		}
+		occur_all += occur_total[i];
+	}
+	
+	// if you didn't find any character occurrences (which means the profile is
+	// FUCKING EMPTY) then just fuck it and return e.
+	if (occur_all == 0) {
+		return 'e';
+	}
+	
+	// find a random number less than the total number of all the characters found
+	long long unsigned random_char = rand()%occur_all;
+	long long unsigned running_total = 0;
+	
+	for (i = 0; i < TXTPROF_CHARACTERS; i++) {
+		running_total += occur_total[i];
+		if (random_char < running_total) {
+			return (char)i;
+		}
+	}
+	
+	// you should never got to this point in the program
+	// but if for some insane reason you do, return something
+	// I chose e because I hope that it is in every text document
+	// but like I said, this point SHOULD never be reached, so this function 
+	// will probably never have to return e.
+	txtprof_log_d("txtprof_gen_char() FAILED! couldn't get first random char! random_char =",(int)random_char);
+	return 'e';
+	
+}
+
+
+/// this will return a character based on the text profile and the character you sent it.
+// the character it chooses is random (meaning it uses the rand() function), but
+// the calculation is based on the weighted averages of the probabilities of 
+// the characters that have been seen to follow the input character.
+// for example, if the text profile is based on the phrase:
+//		"hello"
+// and you send this function an 'e', it MUST return an 'l'.
+// however, if you sent this function an 'l', there would be a 50% chance it
+// would return an 'o', and a 50% chance it would return an 'l' back to you.
+char txtprof_gen_char_next(struct text_profile *pro, unsigned char c){
+	
+	// see if the profil is invalid
+	if (pro == NULL) {
+		txtprof_log("txtprof_gen_char_next() received NULL profile");
+		return -1;
+	}
+	
+	// this keeps track of how many times this specific character has occurred in total
+	long long unsigned occur_all = 0;
+	unsigned i;
+	
+	// sum all characters
+	for (i = 0; i < TXTPROF_CHARACTERS; i ++) {
+		occur_all += pro->occur[c][i];
+	}
+	
+	// if you didn't find any characters that come after the one you were sent,
+	// then, shit, I guess just try to find a new one from the entire text profile.
+	if (occur_all == 0) {
+		return txtprof_gen_char(pro);
+	}
+	
+	// find a random number less than the total number of all the characters found
+	long long unsigned random_char = rand()%occur_all;
+	long long unsigned running_total = 0;
+	
+	for (i = 0; i < TXTPROF_CHARACTERS; i++) {
+		running_total += pro->occur[c][i];
+		if (random_char < running_total) {
+			return (char)i;
+		}
+	}
+	
+	
+	// the program should never reach this point.
+	// the notes I wrote for "return e" in the txtprof_gen_char function.
+	return 'e';
 }

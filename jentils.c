@@ -24,4 +24,3 @@ FILE *skipchar(FILE *fp, char targ){
 }
 
 
-//int max_min_int(int *myarray, int mysize);

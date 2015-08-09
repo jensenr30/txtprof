@@ -31,17 +31,19 @@
 	<stdio.h>
 	"txtprof.h"
 
-1439074570 /mnt/safe/Programming/txtprof/txtprof.h
+1439085432 /mnt/safe/Programming/txtprof/txtprof.h
 
-1439074851 source:/mnt/safe/Programming/txtprof/txtprof.c
+1439091000 source:/mnt/safe/Programming/txtprof/txtprof.c
 	<stdio.h>
+	<stdlib.h>
 	<string.h>
 	"txtprof.h"
-	<stdlib.h>
+	"jentils.h"
+	<time.h>
 
-1439077972 source:/mnt/safe/Programming/txtprof/jentils.c
+1439080721 source:/mnt/safe/Programming/txtprof/jentils.c
 	"jentils.h"
 
-1439077982 /mnt/safe/Programming/txtprof/jentils.h
+1439080721 /mnt/safe/Programming/txtprof/jentils.h
 	<stdio.h>
 

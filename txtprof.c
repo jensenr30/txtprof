@@ -1,7 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "txtprof.h"
-#include <stdlib.h>
+#include "jentils.h"
 
 //==============================================================================
 // these function log errors
@@ -150,17 +151,21 @@ int txtprof(int argc, char *argv[]){
     // load profile
     //--------------------------------------------------------------------------
     
-    // create an empty profile
+    // create a text profile object
     struct text_profile myProf;
-	profile_erase(&myProf);
-	// load a profile if the user requested it
+	// load a profile from file if the user requested it
 	// if the user wanted to load a profile AND process input files, the profile
 	// will be loaded, and then the input file(s) will be processed and the data
 	// from that(them) will be added to the loaded profile.
 	if (load_profile != NULL) {
 		
 		profile_load(&myProf, load_profile);
-	
+		
+	}
+	// if there is no profile data to load,
+	else {
+		// initialize the profile to zeros
+		profile_erase(&myProf);
 	}
 	
 	//--------------------------------------------------------------------------
@@ -204,6 +209,9 @@ int txtprof(int argc, char *argv[]){
 			// record the occurrence
 			myProf.occur[(unsigned char)pc][(unsigned char)cc]++;
 			charsFound++;
+			// record the "current char" in the "previous char" varibable
+			// for the next iteration through this loop
+			pc = cc;
 		}
 		
 		// print file stats
@@ -284,10 +292,14 @@ int profile_save(struct text_profile *pro, char *filename){
 	fprintf(fp,"given_char,following_char,occurrences\n");
 	
 	int i, j;
-	// print all the data from the 
+	// print all the NON-ZERO data from the profile
 	for (i = 0; i < TXTPROF_CHARACTERS; i++) {
 		for (j = 0; j < TXTPROF_CHARACTERS; j++) {
-			fprintf(fp,"%d,%d,%llu\n",i,j,pro->occur[i][j]);
+			// only print profile occurrences if they are non-zero.
+			// This reduces the file size A LOT
+			if (pro->occur[i][j] != 0) {
+				fprintf(fp,"%d,%d,%llu\n",i,j,pro->occur[i][j]);
+			}
 		}
 	}
 	
@@ -300,14 +312,17 @@ int profile_save(struct text_profile *pro, char *filename){
 
 
 /// this loads a profile from a text file in .csv format
+/// be ware! this function will overwrite whatever is in the profile you send it!
 int profile_load(struct text_profile *pro, char *filename){
 	
-	// see if the profil is invalid
+	// see if the profile is invalid
 	if (pro == NULL) {
 		txtprof_log("profile_load() received NULL profile");
 		return -1;
 	}
 	
+	// erase profile object to zeros before loading profile from file
+	profile_erase(pro);
 	
 	// attempt to open the filename for reading
 	FILE *fp = fopen(filename,"r");
@@ -317,10 +332,26 @@ int profile_load(struct text_profile *pro, char *filename){
 		return -2;
 	}
 	
-	/// TODO: write load code
+	// skip the first line (the header)
+	fp = skipchar(fp,'\n');
+	
+	int pc;
+	int cc;
+	long long unsigned occur;
+	while (!feof(fp)) {
+		// input the "previous character"
+		fscanf(fp,"%d,",&pc);
+		// input the "current  character"
+		fscanf(fp,"%d,",&cc);
+		// input the occurrences
+		fscanf(fp,"%llu\n",&occur);
+		// store the loaded occurrence value in the profile.
+		pro->occur[(unsigned char)pc][(unsigned char)cc] = occur;
+	}
 	
 	
-	
+	// close up shop
+	fclose(fp);
 	return 0;
 }
 
@@ -352,12 +383,12 @@ int txtprof_generate(struct text_profile *pro, long long unsigned gen, char *fil
 		}
 	}
 	
-	/// TODO: write generation code. parse the profile to 
+	
+	/// TODO: write generation code. parse the profile to
 	
 	// close the file, if you weren't printing to stdout.
 	if (close) {
 		fclose(fp);
 	}
-	
 	return 0;
 }
